@@ -17,7 +17,7 @@ async function findUser(username) {
 }
 
 ;(async () => {
-    const connector = mongoose.connect(connectionString)
+    const connector = mongoose.connect(connectionString, {useNewUrlParser: true, useFindAndModify: false});
     const username = process.argv[2].split('=')[1]
     
     let user = await connector.then(async () => {

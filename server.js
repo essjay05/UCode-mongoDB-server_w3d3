@@ -2,7 +2,8 @@
 const
     express = require('express'),
     app = express(),
-    quotes = require('./db/mongoose'),
+    // quotes = require('./db/mongoose'),
+    mongoose = require('./db/mongoose'),
     PORT = process.env.PORT || 3000;
 
 // Connect to database

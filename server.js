@@ -6,7 +6,7 @@ const
     Person = require('./models/person'),
     bodyParser = require('body-parser'),
     path = require('path'),
-    PORT = process.env.PORT || 8888;
+    PORT = process.env.PORT || 9000;
 
 // Connect to database
    
@@ -30,8 +30,13 @@ app.use(express.static(__dirname + '/public'));
     // })
 
     // (Read ALL) INDEX: load ALL quotes
-    app.get('/person', (req, res) => {
-        res.json({'success': true, people});
+    app.get('/person', async (req, res) => {
+        console.log(`Finding people in database.`);
+
+        const results = await Person.find({});
+
+        res.status(200).send(results);
+
     })
 
     // (Read ONE) FIND/SHOW: one specific quote
@@ -39,7 +44,14 @@ app.use(express.static(__dirname + '/public'));
     //     let p = Person.find(x => x.id == req.params.id);
     //     res.json({'success': true, p})
     // })
+    app.get('/person/:id', async (req, res) => {
+        console.log(`Finding ${req.params.id}`);
 
+        const result = await Person.find({_id: req.params.id});
+
+        res.status(200).send(result);
+
+    })
     // CREATE: DOC
     app.post('/person', async (req, res) => {
         console.log(req.body);
@@ -59,23 +71,23 @@ app.use(express.static(__dirname + '/public'));
     app.patch('/person/:id', async (req, res) => {
        console.log(req.params.id);
 
-       await Person.findOneAndUpdate({id: req.params.id}, 
+       await Person.findOneAndUpdate({_id: req.params.id}, 
         {
             name: req.body.name,
             age: req.body.age,
             isFun: req.body.isFun
         });
 
-       res.status(200).send(`Updated: ${req.params.id}`);
+       res.status(200).send(`Updated: ${req.params.id}, ${req.body}`);
     });
 
     // DELETE DOCS
-    app.delete('/person/:name', async (req, res) => {
-        console.log(req.params.name);
+    app.delete('/person/:id', async (req, res) => {
+        console.log(req.params.id);
 
-        await Person.findOneAndDelete({id: req.params.name});
+        await Person.findOneAndDelete({_id: req.params.id});
 
-        res.status(200).send(`Deleted: ${req.params.name}`)
+        res.status(200).send(`Deleted: ${req.params.id}`)
     })
 
 

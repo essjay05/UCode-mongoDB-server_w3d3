@@ -6,7 +6,8 @@ const PersonSchema = new mongoose.Schema({
     name : {
         type: String,
         required: true,
-        minlength: 1
+        minlength: 1,
+        unique: true
     },
     age : {
         type: Number,

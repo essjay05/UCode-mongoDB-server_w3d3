@@ -2,16 +2,21 @@
 const
     express = require('express'),
     app = express(),
-    // quotes = require('./db/mongoose'),
     mongoose = require('./db/mongoose'),
-    PORT = process.env.PORT || 3000;
+    Person = require('./models/person'),
+    bodyParser = require('body-parser'),
+    path = require('path'),
+    PORT = process.env.PORT || 8888;
 
 // Connect to database
-    // const quotes = require('./db'); (see constants above)
+   
 
 // MIDDLEWARE connection
 app.use(express.json());
-// var id = 2;
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(__dirname + '/public'));
+
 
 // ROUTES
     // ROOT/HOME Route
@@ -19,31 +24,59 @@ app.use(express.json());
         res.json({'success': true});
     });
 
+
+    // app.get('/person', (req, res) => {
+    //     res.json({'success': true, person})
+    // })
+
     // (Read ALL) INDEX: load ALL quotes
-    app.get('/quotes', (req, res) => {
-        res.json({'success': true, quotes});
+    app.get('/person', (req, res) => {
+        res.json({'success': true, people});
     })
 
     // (Read ONE) FIND/SHOW: one specific quote
-    app.get('/quotes/:id', (req, res) => {
-        let quote = quotes.find(x => x.id == req.params.id);
-        res.json({'success': true, quote})
-    })
+    // app.get('/person/:id', (req, res) => {
+    //     let p = Person.find(x => x.id == req.params.id);
+    //     res.json({'success': true, p})
+    // })
 
-    // CREATE: quote
-    app.post('/quotes', (req, res) => {
-        quotes.push({...req.body, id});
-        id++;
-        res.json({'success': true, quotes});
+    // CREATE: DOC
+    app.post('/person', async (req, res) => {
+        console.log(req.body);
+
+        var person = new Person({
+            name: req.body.name,
+            age: req.body.age,
+            isFun: req.body.isFun
+        });
+        
+        await person.save();
+
+        res.status(200).send(person);
     });
 
-    // UPDATE quote
-    // app.patch('/quotes/:id', (req, res) => {
-    //     let quote = quotes.find(x => x.id == req.params.id);
-    //     quotes.quote = req.body.quote;
-    //     res.json({'success': true, quote});
-    // });
-    // DELETE quote
+    // UPDATE DOCS
+    app.patch('/person/:id', async (req, res) => {
+       console.log(req.params.id);
+
+       await Person.findOneAndUpdate({id: req.params.id}, 
+        {
+            name: req.body.name,
+            age: req.body.age,
+            isFun: req.body.isFun
+        });
+
+       res.status(200).send(`Updated: ${req.params.id}`);
+    });
+
+    // DELETE DOCS
+    app.delete('/person/:name', async (req, res) => {
+        console.log(req.params.name);
+
+        await Person.findOneAndDelete({id: req.params.name});
+
+        res.status(200).send(`Deleted: ${req.params.name}`)
+    })
 
 
 
